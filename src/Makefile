@@ -1,3 +1,4 @@
+# Remove WINC1500 support
 # Set verbosity
 ifeq ($(V), 1)
 Q =
