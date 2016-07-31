@@ -38,7 +38,7 @@ STUSB_DIR=stusb
 FATFS_DIR=fatfs
 MICROPY_DIR=micropython
 OMV_DIR=omv
-WINC1500_DIR=winc1500
+# WINC1500_DIR=winc1500
 BOOT_DIR=bootloader
 
 # Additional qstr definitions for OpenMV
@@ -52,7 +52,7 @@ FW_DIR=$(TOP_DIR)/../firmware/$(TARGET)
 ifeq ($(DEBUG), 1)
 CFLAGS += -O0 -ggdb3
 else
-CFLAGS += -O2 -ggdb3 -DNDEBUG
+CFLAGS += -O1 -ggdb3 -DNDEBUG
 endif
 
 # Compiler Flags
@@ -87,7 +87,7 @@ CFLAGS += -I$(TOP_DIR)/$(OMV_DIR)/
 CFLAGS += -I$(TOP_DIR)/$(OMV_DIR)/py/
 CFLAGS += -I$(TOP_DIR)/$(OMV_DIR)/img/
 CFLAGS += -I$(TOP_DIR)/$(OMV_DIR)/boards/$(TARGET)/
-CFLAGS += -I$(TOP_DIR)/$(WINC1500_DIR)/include/
+# CFLAGS += -I$(TOP_DIR)/$(WINC1500_DIR)/include/
 
 # Linker Flags
 LDFLAGS = -mcpu=cortex-m4 -mabi=aapcs-linux -mthumb -mlittle-endian -mfloat-abi=hard\
@@ -111,7 +111,7 @@ FIRM_OBJ += $(wildcard $(BUILD)/$(CMSIS_DIR)/src/dsp/MatrixFunctions/*.o)
 FIRM_OBJ += $(wildcard $(BUILD)/$(STHAL_DIR)/src/*.o)
 FIRM_OBJ += $(wildcard $(BUILD)/$(FATFS_DIR)/src/*.o)
 FIRM_OBJ += $(wildcard $(BUILD)/$(FATFS_DIR)/src/option/*.o)
-FIRM_OBJ += $(wildcard $(BUILD)/$(WINC1500_DIR)/src/*.o)
+# FIRM_OBJ += $(wildcard $(BUILD)/$(WINC1500_DIR)/src/*.o)
 
 #------------- OpenMV Objects ----------------#
 FIRM_OBJ += $(addprefix $(BUILD)/$(OMV_DIR)/, \
@@ -178,9 +178,9 @@ FIRM_OBJ += $(addprefix $(BUILD)/$(OMV_DIR)/py/, \
 	py_fir.o                                \
 	py_gif.o                                \
 	py_mjpeg.o                              \
-	py_winc.o                               \
 	py_tof.o                                \
 	)
+#	py_winc.o                               \
 
 ifeq ($(TARGET), OPENMV1)
 FIRM_OBJ += $(addprefix $(BUILD)/$(CMSIS_DIR)/src/st/,\
@@ -367,7 +367,7 @@ FIRMWARE_OBJS:
 	$(MAKE)  -C $(STHAL_DIR)          BUILD=$(BUILD)/$(STHAL_DIR)
 	$(MAKE)  -C $(FATFS_DIR)          BUILD=$(BUILD)/$(FATFS_DIR)
 	$(MAKE)  -C $(MICROPY_DIR)/stmhal BUILD=$(BUILD)/$(MICROPY_DIR) BOARD=$(TARGET) QSTR_DEFS=$(OMV_QSTR_DEFS)
-	$(MAKE)  -C $(WINC1500_DIR)       BUILD=$(BUILD)/$(WINC1500_DIR)
+#	$(MAKE)  -C $(WINC1500_DIR)       BUILD=$(BUILD)/$(WINC1500_DIR)
 	$(MAKE)  -C $(OMV_DIR)            BUILD=$(BUILD)/$(OMV_DIR)
 
 # This target generates the main/app firmware image located at 0x08010000
@@ -375,7 +375,7 @@ $(FIRMWARE): FIRMWARE_OBJS
 	$(CPP) -P -E -D$(TARGET) $(OMV_DIR)/stm32f4xx.ld.S > $(BUILD)/stm32f4xx.lds
 	$(CC) $(LDFLAGS) $(FIRM_OBJ) -o $(FW_DIR)/$(FIRMWARE).elf
 	$(OBJCOPY) -Obinary $(FW_DIR)/$(FIRMWARE).elf $(FW_DIR)/$(FIRMWARE).bin
-	$(PYTHON) $(MKDFU) -b 0x08010000:$(FW_DIR)/$(FIRMWARE).bin $(FW_DIR)/$(FIRMWARE).dfu
+#	$(PYTHON) $(MKDFU) -b 0x08010000:$(FW_DIR)/$(FIRMWARE).bin $(FW_DIR)/$(FIRMWARE).dfu
 
 # This target generates the bootloader. The bootloader binary is generated twice,
 # once without padding, to generate the bootloader.dfu file, and once with padding
@@ -384,13 +384,13 @@ $(BOOTLOADER): FIRMWARE_OBJS BOOTLOADER_OBJS
 	$(CPP) -P -E -D$(TARGET) $(BOOT_DIR)/stm32f4xx.ld.S > $(BUILD)/$(BOOT_DIR)/stm32f4xx.lds
 	$(CC) $(BOOT_LDFLAGS) $(BOOT_OBJ) -o $(FW_DIR)/$(BOOTLOADER).elf
 	$(OBJCOPY) -Obinary $(FW_DIR)/$(BOOTLOADER).elf $(FW_DIR)/$(BOOTLOADER).bin
-	$(PYTHON) $(MKDFU) -b 0x08000000:$(FW_DIR)/$(BOOTLOADER).bin $(FW_DIR)/$(BOOTLOADER).dfu
+#	$(PYTHON) $(MKDFU) -b 0x08000000:$(FW_DIR)/$(BOOTLOADER).bin $(FW_DIR)/$(BOOTLOADER).dfu
 	$(OBJCOPY) -Obinary --pad-to=0x08010000 $(FW_DIR)/$(BOOTLOADER).elf $(FW_DIR)/$(BOOTLOADER).bin
 
 # This target generates a combined bootloader+main firmware image.
 $(OPENMV): $(BOOTLOADER) $(FIRMWARE) | $(BUILD)
 	$(CAT) $(FW_DIR)/$(BOOTLOADER).bin $(FW_DIR)/$(FIRMWARE).bin > $(FW_DIR)/$(OPENMV).bin
-	$(PYTHON) $(MKDFU) -b 0x08000000:$(FW_DIR)/$(BOOTLOADER).bin -b 0x08010000:$(FW_DIR)/$(FIRMWARE).bin $(FW_DIR)/$(OPENMV).dfu
+#	$(PYTHON) $(MKDFU) -b 0x08000000:$(FW_DIR)/$(BOOTLOADER).bin -b 0x08010000:$(FW_DIR)/$(FIRMWARE).bin $(FW_DIR)/$(OPENMV).dfu
 	$(SIZE) $(FW_DIR)/$(BOOTLOADER).elf
 	$(SIZE) $(FW_DIR)/$(FIRMWARE).elf
 

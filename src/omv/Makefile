@@ -63,9 +63,9 @@ SRCS += $(addprefix py/, \
 	py_fir.c                \
 	py_gif.c                \
 	py_mjpeg.c              \
-	py_winc.c               \
 	py_tof.c                \
    )
+#	py_winc.c               \
 
 OBJS = $(addprefix $(BUILD)/, $(SRCS:.c=.o))
 OBJ_DIRS = $(sort $(dir $(OBJS)))

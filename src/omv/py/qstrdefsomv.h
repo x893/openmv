@@ -269,6 +269,7 @@ Q(IPPROTO_IPV6)
 Q(IPPROTO_RAW)
 
 // for WINC1500 module
+/*
 Q(WINC)
 Q(connect)
 Q(disconnect)
@@ -287,6 +288,7 @@ Q(ssid)
 Q(key)
 Q(security)
 Q(bssid)
+*/
 
 // ToF Module
 Q(tof)
