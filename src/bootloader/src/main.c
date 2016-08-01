@@ -1,10 +1,7 @@
 #include <stm32f4xx_hal.h>
 #include "usbd_desc.h"
-#include "usbd_cdc.h" 
-
-#define LED_RED     GPIO_PIN_0
-#define LED_GREEN   GPIO_PIN_2
-#define LED_BLUE    GPIO_PIN_1
+#include "usbd_cdc.h"
+#include "bl_board.h"
 
 #define APP_ADDR (0x08010000)
 
@@ -13,9 +10,9 @@ extern USBD_CDC_ItfTypeDef  USBD_CDC_fops;
 
 void __flash_led(uint16_t led)
 {
-    HAL_GPIO_TogglePin(GPIOC, led);
+    HAL_GPIO_TogglePin(LED_PORT, led);
     HAL_Delay(100);
-    HAL_GPIO_TogglePin(GPIOC, led);
+    HAL_GPIO_TogglePin(LED_PORT, led);
     HAL_Delay(100);
 }
 

@@ -7,10 +7,7 @@
  *
  */
 #include <stm32f4xx_hal.h>
-
-#define LED_RED     GPIO_PIN_0
-#define LED_GREEN   GPIO_PIN_2
-#define LED_BLUE    GPIO_PIN_1
+#include "bl_board.h"
 
 void SystemClock_Config();
 
@@ -29,20 +26,14 @@ void HAL_MspInit()
     __GPIOE_CLK_ENABLE();
 
     GPIO_InitTypeDef  GPIO_InitStructure;
-    GPIO_InitStructure.Pull  = GPIO_PULLUP;
+    GPIO_InitStructure.Pull  = GPIO_NOPULL;
     GPIO_InitStructure.Speed = GPIO_SPEED_LOW;
-    GPIO_InitStructure.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStructure.Mode  = GPIO_MODE_OUTPUT_OD;
 
-    GPIO_InitStructure.Pin = LED_RED;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
-    
-    GPIO_InitStructure.Pin = LED_GREEN;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
- 
-    GPIO_InitStructure.Pin = LED_BLUE;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
+    GPIO_InitStructure.Pin = (LED_RED | LED_GREEN | LED_BLUE);
+    HAL_GPIO_Init(LED_PORT, &GPIO_InitStructure);
 
-    HAL_GPIO_WritePin(GPIOC, LED_RED, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOC, LED_GREEN, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(GPIOC, LED_BLUE, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_PORT, LED_RED, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_PORT, LED_GREEN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_PORT, LED_BLUE, GPIO_PIN_SET);
 }
